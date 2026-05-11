@@ -9,23 +9,31 @@ A CLI tool written in Go that splits long PNG images into smaller, page-sized ve
 
 ## Installation
 
+### Method 1: Using the build script (Linux & macOS)
 The project includes a `build.sh` script that compiles the Go binary and installs it globally on your system.
 
 1. Clone the repository:
    ```bash
    git clone git@github.com:r1tokk/image-slicer.git
    cd image-slicer
+   ```
 2. Run the build script (you may need sudo since it copies the executable to /usr/local/bin):
     ```bash 
     chmod +x build.sh
     sudo ./build.sh
+    ```
+### Method 2: Manual Build & Cross-Compilation (Windows)
+```powershell
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build -o image-slicer.exe main.go
+```
+Also it can be useful to copy exe file into C:\ disk
+
 
 ## Usage
 
 The primary command to split images is `slice`:
-
+    
     image-slicer slice -f <input_file.png> [flags]    
-
 ### Basic Usage
     image-slicer slice -f "document.png"
 
@@ -40,6 +48,10 @@ The primary command to split images is `slice`:
 If you use [freeze](https://github.com/charmbracelet/freeze) to generate beautiful, long screenshots of your code, you can easily slice them into paginated chunks. 
 
 Because `freeze` determines its output format based on the file extension (defaulting to SVG if piped), the most reliable way to slice its output is by chaining commands to create, process, and delete a temporary `.png` file in one go:
-
+#### Linux/macOS
 ```bash
 freeze main.go -o temp.png && image-slicer slice -f temp.png -H 800 -p "code-page-" -o "./code_chunks" && rm temp.png
+```
+#### Windows
+```powershell
+freeze main.go -o temp.png ; C:\image-slicer.exe slice -f temp.png -H 800 -p "code-page-" -o ".\code_chunks" ; Remove-Item temp.png
