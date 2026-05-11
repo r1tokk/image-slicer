@@ -27,18 +27,15 @@ for easier reading or printing.
 Example usage:
   image-slicer slice -f "document.png" -H 800 -p "page-" -o "./output_folder"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		red := color.New(color.FgRed).SprintFunc()
-		cyan := color.New(color.FgCyan).SprintFunc()
-
 		file, err := os.Open(inputFile)
 		if err != nil {
-			return fmt.Errorf(red("error opening file: %w", err))
+			return fmt.Errorf("%s %w", color.RedString("error opening file:"), err)
 		}
 		defer file.Close()
 
 		img, _, err := image.Decode(file)
 		if err != nil {
-			return fmt.Errorf(red("error decoding image: %w", err))
+			return fmt.Errorf("%s %w", color.RedString("error opening file:"), err)
 		}
 
 		bounds := img.Bounds()
@@ -56,11 +53,11 @@ Example usage:
 
 		sImg, ok := img.(subImager)
 		if !ok {
-			return fmt.Errorf(red("image format does not support cropping"))
+			return fmt.Errorf(color.RedString("image format does not support cropping"))
 		}
 
 		if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
-			return fmt.Errorf(red("error creating output directory: %w", err))
+			return fmt.Errorf("%s %w", color.RedString("error creating output directory:"), err)
 		}
 
 		for i := 0; i < chunks; i++ {
@@ -78,16 +75,16 @@ Example usage:
 
 			out, err := os.Create(fullPath)
 			if err != nil {
-				return fmt.Errorf(red("error creating file %s: %w", fullPath, err))
+				return fmt.Errorf("%s %w", color.RedString("error creating file %s:", fullPath), err)
 			}
 
 			if err := png.Encode(out, cropped); err != nil {
 				out.Close()
-				return fmt.Errorf(red("error encoding png: %w", err))
+				return fmt.Errorf("%s %w", color.RedString("error encoding png:"), err)
 			}
 
 			out.Close()
-			fmt.Printf(cyan("Generated %s\n", fullPath))
+			color.Cyan("Generated %s\n", fullPath)
 		}
 
 		return nil
